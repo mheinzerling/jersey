@@ -421,7 +421,7 @@ public class WebComponent {
             final HttpServletResponse servletResponse,
             final ResponseWriter responseWriter) throws IOException {
 
-        requestContext.setEntityStream(servletRequest.getInputStream());
+        setEntityStream(requestContext, servletRequest);
         requestContext.setRequestScopedInitializer(requestScopedInitializer.get(new RequestContextProvider() {
             @Override
             public HttpServletRequest getHttpServletRequest() {
@@ -439,6 +439,10 @@ public class WebComponent {
         // of the media type application/x-www-form-urlencoded
         // This can happen if a filter calls request.getParameter(...)
         filterFormParameters(servletRequest, requestContext);
+    }
+
+    static void setEntityStream(ContainerRequest requestContext, HttpServletRequest servletRequest) throws IOException {
+        requestContext.setEntityStream(servletRequest.getInputStream());
     }
 
     /**
