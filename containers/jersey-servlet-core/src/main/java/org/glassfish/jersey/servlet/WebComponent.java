@@ -424,20 +424,7 @@ public class WebComponent {
             final HttpServletResponse servletResponse,
             final ResponseWriter responseWriter) throws IOException {
 
-        try {
-            requestContext.setEntityStream(new InputStreamWrapper() {
-                @Override
-                protected InputStream getWrapped() {
-                    try {
-                        return servletRequest.getInputStream();
-                    } catch (IOException e) {
-                        throw new UncheckedIOException(e);
-                    }
-                }
-            });
-        } catch (UncheckedIOException e) {
-            throw e.getCause();
-        }
+        setEntityStream(requestContext, servletRequest);
 
         requestContext.setRequestScopedInitializer(requestScopedInitializer.get(new RequestContextProvider() {
             @Override
@@ -456,6 +443,23 @@ public class WebComponent {
         // of the media type application/x-www-form-urlencoded
         // This can happen if a filter calls request.getParameter(...)
         filterFormParameters(servletRequest, requestContext);
+    }
+
+    static void setEntityStream(ContainerRequest requestContext, HttpServletRequest servletRequest) throws IOException {
+        try {
+            requestContext.setEntityStream(new InputStreamWrapper() {
+                @Override
+                protected InputStream getWrapped() {
+                    try {
+                        return servletRequest.getInputStream();
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                }
+            });
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
+        }
     }
 
     /**
